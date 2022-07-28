@@ -1,5 +1,4 @@
-FROM ubuntu:latest
-MAINTAINER Rodrigo Cosme <rdccosmo@gmail.com>
+FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN \
@@ -9,45 +8,30 @@ RUN \
     && apt-get update \
     && apt-get install -y --allow-unauthenticated \
         gfortran \
-        gfortran-5-multilib \
         csh \
         build-essential \
-        libcloog-ppl1 \
         m4 \
         wget \
         ncl-ncarg \
         libgrib2c-dev \
         libjpeg-dev \
         libudunits2-dev \
-        python \
-        python-pip \
-        python-tk \
-        python-matplotlib \
-        python-matplotlib-data \
-        python-imaging \
-        python-numpy \
-        python-scipy \
-        python-systemd \
+        python3 \
+	python3-pip \
         libsystemd-dev \
         curl \
         imagemagick \
         libjpeg-dev \
-        libopenjpeg-dev \
-        libopenjpeg5 \
         libg2-dev \
         libg20 \
-        libjasper-dev \
-        libjasper1 \
         libx11-6 \
         libxaw7 \
         libmagickwand-dev \
         git \
         autotools-dev \
         autoconf \
-        libproj9 \
-		libproj-dev \
+	libproj-dev \
         proj-bin \
-        python-gdal \
         libgdal-dev \
         gdal-bin \
     && rm -rf /var/lib/apt/lists/*

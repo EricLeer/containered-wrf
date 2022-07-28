@@ -239,9 +239,9 @@ install_all() {
     install_pygrads
     install_libgeos
     install_anaconda
-    install_pyproj
-    install_basemap
-    install_cartopy
+#    install_pyproj
+#    install_basemap
+#    install_cartopy
 }
 
 if [ ! -d /home/wrf/data ]; then
