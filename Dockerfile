@@ -76,7 +76,7 @@ USER wrf
 RUN ./build.sh
 COPY scripts $PREFIX
 COPY entrypoint.sh $PREFIX
-ENTRYPOINT ["entrypoint.sh"]
-CMD ["bash"]
+# ENTRYPOINT ["entrypoint.sh"]
+# CMD ["bash"]
 VOLUME /home/wrf/data
 VOLUME /home/wrf/cron
