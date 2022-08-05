@@ -69,7 +69,7 @@ install_wrf() {
     # wget http://www2.mmm.ucar.edu/wrf/src/WRFV3.6.1.TAR.gz -P $PREFIX
     # tar -zxvf $PREFIX/WRFV3.6.1.TAR.gz -C $PREFIX
     # rm -f $PREFIX/WRFV3.6.1.TAR.gz
-    git clone --recurse-submodules https://github.com/wrf-model/WRF WRFV4
+    git clone --recurse-submodules https://github.com/wrf-model/WRF $PREFIX/WRFV4
     cd $PREFIX/WRFV4
     echo $WRF_CONFIGURE_OPTION | ./configure
     ./compile em_real
@@ -99,7 +99,7 @@ install_wps() {
 	# wget http://www2.mmm.ucar.edu/wrf/src/WPSV3.7.TAR.gz -P $PREFIX
 	# tar zxvf $PREFIX/WPSV3.7.TAR.gz -C $PREFIX
 	# rm $PREFIX/WPSV3.7.TAR.gz
-    git clone https://github.com/wrf-model/WPS
+    git clone https://github.com/wrf-model/WPS $PREFIX/WPS
     cd $PREFIX/WPS
     echo 1 | NCARG_ROOT=$PREFIX PATH=$NCARG_ROOT/bin:$PATH NETCDF=$PREFIX JASPERLIB=$PREFIX/lib JASPERINC=$PREFIX/include ./configure
     ./compile
