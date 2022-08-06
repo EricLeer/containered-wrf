@@ -12,7 +12,10 @@ install_szip() {
 }
 
 install_zlib() {
-    git clone https://github.com/madler/zlib $PREFIX/zlib
+    curl -L -S https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/zlib-1.2.7.tar.gz -o $PREFIX/zlib-1.2.7.tar.gz
+    tar zxvf $PREFIX/zlib-1.2.7.tar.gz -C $PREFIX
+    rm $PREFIX/zlib-1.2.7.tar.gz
+    mv $PREFIX/zlib-1.2.7 zlib
     cd $PREFIX/zlib
     ./configure --prefix=$PREFIX
     make
@@ -33,10 +36,10 @@ install_hdf5() {
 }
 
 install_netcdf_c() {
-    curl -L -S https://github.com/Unidata/netcdf-c/archive/v4.5.tar.gz -o $PREFIX/netcdf-4.5.tar.gz
-    tar zxvf $PREFIX/netcdf-4.5.tar.gz -C $PREFIX
-    rm $PREFIX/netcdf-4.5.tar.gz
-    mv $PREFIX/netcdf-c-4.5 $PREFIX/netcdf-c
+    curl -L -S https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/netcdf-4.1.3.tar.gz -o $PREFIX/netcdf-4.1.3.tar.gz
+    tar zxvf $PREFIX/netcdf-4.1.3.tar.gz -C $PREFIX
+    rm $PREFIX/netcdf-4.1.3.tar.gz
+    mv $PREFIX/netcdf-4.1.3 $PREFIX/netcdf-c
     cd $PREFIX/netcdf-c
     LD_LIBRARY_PATH=$PREFIX/lib CPPFLAGS=-I$PREFIX/include LDFLAGS=-L$PREFIX/lib ./configure --prefix=$PREFIX --disable-dap --disable-netcdf-4 --disable-shared
     make
@@ -55,10 +58,10 @@ install_netcdf_fortran() {
 }
 
 install_mpich() {
-    curl --max-time 900 -L -S http://www.mpich.org/static/downloads/3.2/mpich-3.2.tar.gz -o $PREFIX/mpich-3.2.tar.gz
-    tar zxvf $PREFIX/mpich-3.2.tar.gz -C $PREFIX
-    rm $PREFIX/mpich-3.2.tar.gz
-    mv $PREFIX/mpich-3.2 $PREFIX/mpich
+    curl --max-time 900 -L -S https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/mpich-3.0.4.tar.gz -o $PREFIX/mpich-3.0.4.tar.gz
+    tar zxvf $PREFIX/mpich-3.0.4.tar.gz -C $PREFIX
+    rm $PREFIX/mpich-3.0.4.tar.gz
+    mv $PREFIX/mpich-3.0.4 $PREFIX/mpich
     cd $PREFIX/mpich
     ./configure --prefix=$PREFIX
     make
@@ -71,12 +74,13 @@ install_wrf() {
     # rm -f $PREFIX/WRFV3.6.1.TAR.gz
     git clone --recurse-submodules https://github.com/wrf-model/WRF $PREFIX/WRFV4
     cd $PREFIX/WRFV4
+    export NETCDF_classic=1
     echo $WRF_CONFIGURE_OPTION | ./configure
     ./compile em_real
 }
 
 install_libpng() {
-    curl --max-time 900 -L -S http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/libpng-1.2.50.tar.gz -o $PREFIX/libpng-1.2.50.tar.gz
+    curl --max-time 900 -L -S  https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/libpng-1.2.50.tar.gz -o $PREFIX/libpng-1.2.50.tar.gz
     tar -zxvf $PREFIX/libpng-1.2.50.tar.gz -C $PREFIX
     rm $PREFIX/libpng-1.2.50.tar.gz
     cd $PREFIX/libpng-1.2.50
@@ -86,7 +90,7 @@ install_libpng() {
 }
 
 install_jasper() {
-    curl --max-time 900 -L -S http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/jasper-1.900.1.tar.gz -o $PREFIX/jasper-1.900.1.tar.gz
+    curl --max-time 900 -L -S https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/jasper-1.900.1.tar.gz -o $PREFIX/jasper-1.900.1.tar.gz
     tar -zxvf $PREFIX/jasper-1.900.1.tar.gz -C $PREFIX
     rm $PREFIX/jasper-1.900.1.tar.gz
     cd $PREFIX/jasper-1.900.1
@@ -228,19 +232,19 @@ install_all() {
     install_netcdf_c
     install_netcdf_fortran
     install_mpich
-    install_wrf
     install_libpng
     install_jasper
+    install_wrf
     install_wps
-    install_arwpost
-    install_g2lib
-    install_w3lib
-    install_g95
-    install_cnvgrib
-    install_grads
-    install_pygrads
-    install_libgeos
-    install_anaconda
+#    install_arwpost
+#    install_g2lib
+#    install_w3lib
+#    install_g95
+#    install_cnvgrib
+#    install_grads
+#    install_pygrads
+#    install_libgeos
+#    install_anaconda
 #    install_pyproj
 #    install_basemap
 #    install_cartopy
