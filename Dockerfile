@@ -34,6 +34,7 @@ RUN \
         proj-bin \
         libgdal-dev \
         gdal-bin \
+	neovim \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PREFIX /home/wrf
