@@ -19,3 +19,4 @@ MetPy
 siphon
 xarray
 git+https://github.com/lewisjared/wrfconf.git@776bdab24104dbd9afdbe2fe92068e8fcaddb3ce
+requests
