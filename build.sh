@@ -72,8 +72,8 @@ install_wrf() {
     # wget http://www2.mmm.ucar.edu/wrf/src/WRFV3.6.1.TAR.gz -P $PREFIX
     # tar -zxvf $PREFIX/WRFV3.6.1.TAR.gz -C $PREFIX
     # rm -f $PREFIX/WRFV3.6.1.TAR.gz
-    git clone --recurse-submodules https://github.com/wrf-model/WRF $PREFIX/WRFV4
-    cd $PREFIX/WRFV4
+    git clone --recurse-submodules https://github.com/wrf-model/WRF $PREFIX/WRF
+    cd $PREFIX/WRF
     export NETCDF_classic=1
     echo $WRF_CONFIGURE_OPTION | ./configure
     ./compile em_real

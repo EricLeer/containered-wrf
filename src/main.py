@@ -1,31 +1,33 @@
 import argparse
-import yaml
-import tempfile
-import subprocess
 import ftplib
 import logging
+import subprocess
+import tempfile
 from datetime import datetime
+
+import yaml
+
+from load_wrf_geog import decompres_geog_files, get_geog_data
+from run_wrf import run_wrf
 
 logging.basicConfig(level=logging.INFO)
 
 BASE_NAMELIST_PATH = "base_namelist.yaml"
 
+
 def create_namelist(forecast_date):
     """
-    Creates a yaml namelist file, edits the given `forecast_date` and converts it into the wrf 
-    `namelist.input` and `namelist.wps` format. 
+    Creates a yaml namelist file, edits the given `forecast_date` and converts it into the wrf
+    `namelist.input` and `namelist.wps` format.
     """
     base_namelist = open_base_namelist()
-   
-    base_namelist['run_info']['start_date'] = forecast_date
+
+    base_namelist["run_info"]["start_date"] = forecast_date
 
     tmp_namelist_path = write_namelist_yaml(base_namelist)
-    
-    subprocess.run([
-        "wrfconf", 
-        "create",
-        tmp_namelist_path
-    ])
+
+    subprocess.run(["wrfconf", "create", tmp_namelist_path])
+
 
 def open_base_namelist():
     with open(BASE_NAMELIST_PATH) as file:
@@ -33,10 +35,12 @@ def open_base_namelist():
 
     return base_namelist
 
+
 def write_namelist_yaml(namelist_yaml):
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as tmp:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as tmp:
         yaml.dump(namelist_yaml, tmp)
         return tmp.name
+
 
 def load_gfs_files(forecast_start_date):
     gfs_url = "ftpprd.ncep.noaa.gov"
@@ -44,28 +48,33 @@ def load_gfs_files(forecast_start_date):
 
     ftp = ftplib.FTP(gfs_url)
     ftp.login()
-    # ftp.login("UserName", "Password") 
+    # ftp.login("UserName", "Password")
     ftp.cwd(gfs_path)
-    for i in range(0,25,3):
-        gfs_filename = f'gfs.t00z.pgrb2.0p50.f{i:03d}'
+    for i in range(0, 25, 3):
+        gfs_filename = f"gfs.t00z.pgrb2.0p50.f{i:03d}"
         local_filename = f"data/GFS_{i:02d}"
 
         logging.info(f"Loading file {gfs_filename} to {local_filename}")
-        with open(local_filename, 'wb') as f:
+        with open(local_filename, "wb") as f:
             ftp.retrbinary("RETR " + gfs_filename, f.write)
     ftp.quit()
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Create wrf namelist files')
-    parser.add_argument('forecast_date', help='Forecast start date')
+    parser = argparse.ArgumentParser(description="Create wrf namelist files")
+    parser.add_argument("forecast_date", help="Forecast start date")
 
     args = parser.parse_args()
-    
+
     forecast_start_date = datetime.fromisoformat(args.forecast_date)
-    
+
     logging.info("Creating namelist..")
-    create_namelist(forecast_start_date.strftime('%Y-%m-%d_%H:%M:%S'))
+    create_namelist(forecast_start_date.strftime("%Y-%m-%d_%H:%M:%S"))
 
     logging.info("Loading GFS initialization files..")
     load_gfs_files(forecast_start_date)
 
+    get_geog_data()
+    decompres_geog_files()
+
+    run_wrf()
