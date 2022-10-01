@@ -68,10 +68,10 @@ RUN mkdir -p /home/wrf && \
     useradd wrf -d /home/wrf && \
     chown -R wrf:wrf /home/wrf
 RUN ulimit -s unlimited
-COPY requirements.yml $PREFIX
+COPY requirements.txt $PREFIX
 RUN pip install --upgrade pip pip
 RUN pip install --upgrade pip setuptools
-RUN pip install -r requirements.yml
+RUN pip install -r requirements.txt
 COPY build.sh $PREFIX
 USER wrf
 RUN ./build.sh

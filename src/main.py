@@ -3,12 +3,15 @@ import ftplib
 import logging
 import subprocess
 import tempfile
+import pendulum
+
 from datetime import datetime
 
 import yaml
 
 from load_wrf_geog import decompres_geog_files, get_geog_data
 from run_wrf import run_wrf
+from post_forecast import process_post_forecast
 
 logging.basicConfig(level=logging.INFO)
 
@@ -78,3 +81,8 @@ if __name__ == "__main__":
     decompres_geog_files()
 
     run_wrf()
+    
+    process_post_forecast(
+        f"wrfout_d02_{forecast_start_date.strftime('%Y-%m-%d_%H:%M:%S')}", 
+        start=pendulum.instance(forecast_start_date)
+    )

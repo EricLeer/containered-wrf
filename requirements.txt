@@ -20,3 +20,4 @@ siphon
 xarray
 requests
 git+https://github.com/ericleer/wrfconf.git@e87da9fb82026d3c71e2e95ebcc92a289e2c1be4
+pendulum
