@@ -7,6 +7,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+SERVER_URL = "https://weather.ericleer.com/v1/weather"
+
 def select_point(ds, lat, lon):
     # First, find the index of the grid point nearest a specific lat/lon.   
     abslat = np.abs(ds.XLAT[0]-lat)
@@ -62,5 +64,5 @@ def process_post_forecast(filename, start):
     json_arr = construct_json(point_ds)
     
     logger.info(f"Posting {len(json_arr)} forecasts to the api")
-    r = requests.post("http://localhost:8080/v1/weather", json=json_arr)
+    r = requests.post(SERVER_URL, json=json_arr)
     r.raise_for_status()

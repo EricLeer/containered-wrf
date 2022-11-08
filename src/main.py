@@ -66,7 +66,7 @@ def load_gfs_files(forecast_start_date):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create wrf namelist files")
     parser.add_argument("forecast_date", help="Forecast start date")
-
+    parser.add_argument("num_cores", default=1, help="number of cores used for forecasting")
     args = parser.parse_args()
 
     forecast_start_date = datetime.fromisoformat(args.forecast_date)
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     get_geog_data()
     decompres_geog_files()
 
-    run_wrf()
+    run_wrf(num_cores=args.num_cores)
     
     process_post_forecast(
         f"wrfout_d02_{forecast_start_date.strftime('%Y-%m-%d_%H:%M:%S')}", 
