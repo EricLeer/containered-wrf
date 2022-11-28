@@ -20,13 +20,11 @@ domain:
   dx: [36000, 12000]
   dy: [36000, 12000]
   map_proj: 'lambert'
-  ref_lat: 5.180
-  ref_lon: 52.109
-  # ref_x: 42.5
-  # ref_y: 46.5
-  truelat1: 5.180
-  truelat2: 5.180
-  stand_lon: 52.109
+  ref_lat: 52.1
+  ref_lon: 5.2
+  truelat1: 52.1
+  truelat2: 52.1
+  stand_lon: 5.2
   geog_data_res: ['10m','2m']
 
 wps:
