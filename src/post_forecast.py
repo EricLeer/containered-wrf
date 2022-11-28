@@ -55,14 +55,19 @@ def process_post_forecast(filename, start):
     ds["windspeed"] = np.sqrt((ds["U10"]**2 + ds["V10"]**2))
     ds["wind_direction"] = (np.rad2deg(np.arctan(ds["V10"] / ds["U10"])) * 2)
 
-    lat = 52.4
-    lon = 4.9
+    lat_min = 48
+    lat_max = 56
+    lon_min = 3
+    lon_max = 9
 
-    logger.info(f"Selecting point {(lat, lon)}")
-    point_ds = select_point(ds, lat, lon)
+    for lat in np.arange(lat_min, lat_max, 0.1):
+        for lon in np.arange(lon_min, lon_max, 0.1):
+            logger.info(f"Selecting point {(lat, lon)}")
+            point_ds = select_point(ds, lat, lon)
 
-    json_arr = construct_json(point_ds)
+            json_arr = construct_json(point_ds)
     
-    logger.info(f"Posting {len(json_arr)} forecasts to the api")
-    r = requests.post(SERVER_URL, json=json_arr)
-    r.raise_for_status()
+            logger.info(f"Posting {len(json_arr)} forecasts to the api")
+            r = requests.post(SERVER_URL, json=json_arr)
+            r.raise_for_status()
+
