@@ -7,7 +7,7 @@ import glob
 logger = logging.getLogger(__name__)
 
 
-def run_wrf():
+def run_wrf(num_cores=1):
     logger.info("Running WPS..")
     subprocess.run([
         "mv",
@@ -68,7 +68,7 @@ def run_wrf():
     subprocess.run([
         "mpirun",
         "-np",
-        "8",
+        f"{str(num_cores)}",
         "./wrf.exe"])
 
 
