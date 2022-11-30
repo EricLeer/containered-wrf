@@ -60,6 +60,8 @@ def process_post_forecast(filename, start):
 
     for lat in np.arange(lat_min, lat_max, 0.1):
         for lon in np.arange(lon_min, lon_max, 0.1):
+            lat=lat.round(1),
+            lon=lon.round(1),
             logger.info(f"Selecting point {(lat, lon)}")
             point_ds = select_point(ds, lat, lon)
 
