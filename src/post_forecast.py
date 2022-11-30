@@ -20,7 +20,7 @@ def select_point(ds, lat, lon):
     # Now I can use that index location to get the values at the x/y diminsion
     return ds.sel(south_north=xloc, west_east=yloc)
 
-def construct_json(point_ds):
+def construct_json(lat, lon, point_ds):
     logger.info("Constructing json")
     json_arr = []
 
@@ -33,6 +33,8 @@ def construct_json(point_ds):
     for i, time in enumerate(point_ds.Time):
         json_arr.append({
             "Location": "Amsterdam",
+            "Lat": lat,
+            "Lon": lon, 
             "Timestamp": pd.to_datetime(str(time.values)).strftime('%Y-%m-%dT%H:%M:%SZ'),
             "Forecast_timestamp": forecast_timestamp,
             "windspeed": point_ds["windspeed"][i].item(),
@@ -56,20 +58,22 @@ def process_post_forecast(filename, start):
     ds["wind_direction"] = (np.rad2deg(np.arctan(ds["V10"] / ds["U10"])) * 2)
 
     lat_min = 48
-    lat_max = 56
+    lat_max = 53.4
     lon_min = 3
     lon_max = 9
 
     for lat in np.arange(lat_min, lat_max, 0.1):
+        json_output = []
         for lon in np.arange(lon_min, lon_max, 0.1):
-            lat=lat.round(1),
-            lon=lon.round(1),
+            lat=lat.round(1)
+            lon=lon.round(1)
             logger.info(f"Selecting point {(lat, lon)}")
             point_ds = select_point(ds, lat, lon)
 
-            json_arr = construct_json(point_ds)
-    
-            logger.info(f"Posting {len(json_arr)} forecasts to the api")
-            r = requests.post(SERVER_URL, json=json_arr)
-            r.raise_for_status()
+            json_arr = construct_json(lat, lon, point_ds)
+
+            json_output = json_output + json_arr
+        logger.info(f"Posting {len(json_arr)} forecasts to the api")
+        r = requests.post(SERVER_URL, json=json_output)
+        r.raise_for_status()
 
