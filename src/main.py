@@ -1,17 +1,18 @@
 import argparse
 import ftplib
 import logging
+import os
+import shutil
 import subprocess
 import tempfile
-import pendulum
-
 from datetime import datetime
 
+import pendulum
 import yaml
 
 from load_wrf_geog import decompres_geog_files, get_geog_data
-from run_wrf import run_wrf
 from post_forecast import process_post_forecast
+from run_wrf import run_wrf
 
 logging.basicConfig(level=logging.INFO)
 
@@ -66,7 +67,9 @@ def load_gfs_files(forecast_start_date):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create wrf namelist files")
     parser.add_argument("forecast_date", help="Forecast start date")
-    parser.add_argument("num_cores", default=1, help="number of cores used for forecasting")
+    parser.add_argument(
+        "num_cores", default=1, help="number of cores used for forecasting"
+    )
     args = parser.parse_args()
 
     forecast_start_date = datetime.fromisoformat(args.forecast_date)
@@ -77,12 +80,18 @@ if __name__ == "__main__":
     logging.info("Loading GFS initialization files..")
     load_gfs_files(forecast_start_date)
 
-    get_geog_data()
-    decompres_geog_files()
+    # Check for presence of geog file, if it is not there load it, else move it to the local location
+    geog_path = "/home/wrf/data/WPS_GEOG_LOW_RES"
+    if os.path.exists(geog_path):
+        logging.info(f"GEOG data already loaded at {geog_path}, just moving files.")
+        shutil.move(geog_path, "/home/wrf/")
+    else:
+        get_geog_data()
+        decompres_geog_files()
 
     run_wrf(num_cores=args.num_cores)
-    
+
     process_post_forecast(
-        f"wrfout_d02_{forecast_start_date.strftime('%Y-%m-%d_%H:%M:%S')}", 
-        start=pendulum.instance(forecast_start_date)
+        f"wrfout_d02_{forecast_start_date.strftime('%Y-%m-%d_%H:%M:%S')}",
+        start=pendulum.instance(forecast_start_date),
     )
