@@ -49,7 +49,7 @@ def write_namelist_yaml(namelist_yaml):
 def load_gfs_files_remote(forecast_start_date):
     gfs_url = "ftpprd.ncep.noaa.gov"
     gfs_path = f"pub/data/nccf/com/gfs/prod/gfs.{forecast_start_date.strftime('%Y%m%d')}/00/atmos/"
-    
+
     ftp = ftplib.FTP(gfs_url)
     ftp.login()
     # ftp.login("UserName", "Password")
@@ -63,6 +63,7 @@ def load_gfs_files_remote(forecast_start_date):
             ftp.retrbinary("RETR " + gfs_filename, f.write)
     ftp.quit()
 
+
 def load_gfs_files_local(forecast_start_date, local_file_path, datetime="2022080100"):
     for i in range(0, 25, 3):
         gfs_filename = f"{local_file_path}/gfs.0p25.{datetime}.f{i:03d}.grib2"
@@ -72,11 +73,18 @@ def load_gfs_files_local(forecast_start_date, local_file_path, datetime="2022080
 
         shutil.copy(gfs_filename, local_filename)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create wrf namelist files")
     parser.add_argument("forecast_date", help="Forecast start date")
     parser.add_argument(
         "num_cores", default=1, help="number of cores used for forecasting"
+    )
+    parser.add_argument(
+        "--post_api",
+        type=bool,
+        default=False,
+        help="Post the resultant forecast to the api, else will be copied to the local system",
     )
     args = parser.parse_args()
 
@@ -86,10 +94,14 @@ if __name__ == "__main__":
     create_namelist(forecast_start_date.strftime("%Y-%m-%d_%H:%M:%S"))
 
     logging.info("Loading GFS initialization files..")
-    
+
     gfs_local_path = "/home/wrf/external_data/gfs_forecasts"
     if os.path.exists(gfs_local_path):
-        load_gfs_files_local(forecast_start_date, gfs_local_path, datetime=forecast_start_date.strftime("%Y%m%d00"))
+        load_gfs_files_local(
+            forecast_start_date,
+            gfs_local_path,
+            datetime=forecast_start_date.strftime("%Y%m%d00"),
+        )
     else:
         load_gfs_files_remote(forecast_start_date)
 
@@ -104,7 +116,21 @@ if __name__ == "__main__":
 
     run_wrf(num_cores=args.num_cores)
 
-    process_post_forecast(
-        f"wrfout_d02_{forecast_start_date.strftime('%Y-%m-%d_%H:%M:%S')}",
-        start=pendulum.instance(forecast_start_date),
-    )
+    output_filename = f"wrfout_d02_{forecast_start_date.strftime('%Y-%m-%d_%H:%M:%S')}"
+    if args.post_api:
+        process_post_forecast(
+            output_filename,
+            start=pendulum.instance(forecast_start_date),
+        )
+    else:
+        output_filename_outer = f"wrfout_d01_{forecast_start_date.strftime('%Y-%m-%d_%H:%M:%S')}"
+
+        shutil.copy(
+            output_filename,
+            f"/home/wrf/external_data/forecast_output/{output_filename}",
+        )
+
+        shutil.copy(
+            output_filename_outer,
+            f"/home/wrf/external_data/forecast_output/{output_filename_outer}",
+        )
