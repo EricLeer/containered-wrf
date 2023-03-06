@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 
 if __name__ == '__main__':
     start_date = "2022-08-01"
-    end_date = "2022-08-01"
+    end_date = "2022-08-31"
     logging.info("Running hindcast from {start_date} till {end_date}")
     
     dates = pd.date_range(start=start_date, end=end_date, freq="1D")
