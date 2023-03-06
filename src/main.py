@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 from datetime import datetime
 
+from pathlib import Path
 import pendulum
 import yaml
 
@@ -86,6 +87,20 @@ if __name__ == "__main__":
         default=False,
         help="Post the resultant forecast to the api, else will be copied to the local system",
     )
+
+    parser.add_argument(
+        "--postprocess",
+        type=bool,
+        default=False,
+        help="Postprocess the forecast results into a common format"
+    )
+
+    parser.add_argument(
+        "--save_folder",
+        type=str,
+        default="",
+        help="Folder in which the forecast will be saved"
+    )
     args = parser.parse_args()
 
     forecast_start_date = datetime.fromisoformat(args.forecast_date)
@@ -106,10 +121,10 @@ if __name__ == "__main__":
         load_gfs_files_remote(forecast_start_date)
 
     # Check for presence of geog file, if it is not there load it, else move it to the local location
-    geog_path = "/home/wrf/external_data/WPS_GEOG_LOW_RES"
+    geog_path = "/home/wrf/external_data/WPS_GEOG"
     if os.path.exists(geog_path):
         logging.info(f"GEOG data already loaded at {geog_path}, just moving files.")
-        shutil.copytree(geog_path, "/home/wrf/WPS_GEOG_LOW_RES")
+        shutil.copytree(geog_path, "/home/wrf/WPS_GEOG")
     else:
         get_geog_data()
         decompres_geog_files()
@@ -117,20 +132,39 @@ if __name__ == "__main__":
     run_wrf(num_cores=args.num_cores)
 
     output_filename = f"wrfout_d02_{forecast_start_date.strftime('%Y-%m-%d_%H:%M:%S')}"
+    if args.save_folder:
+        save_folder = args.save_folder
+    else:
+        save_folder = "default"
+
+    if not args.post_api:
+        save_folder = f"/home/wrf/external_data/forecast_output/{save_folder}"
+        Path(save_folder).mkdir(parents=True, exist_ok=True)
     if args.post_api:
         process_post_forecast(
             output_filename,
             start=pendulum.instance(forecast_start_date),
         )
+    elif args.postprocess:
+        subprocess.run([
+            "/home/wrf/miniconda3/bin/conda",
+            "run",
+            "-n",
+            "postenv",
+            "python",
+            "/home/wrf/postprocess_hindcast.py",
+            output_filename,
+        ])
+        
+        postprocessed_filename = f"{output_filename}_processed.nc"
+        logging.info(f"Copying file {postprocessed_filename} to output")
+        shutil.copy(
+            postprocessed_filename,
+            f"{save_folder}/{postprocessed_filename}",
+        )
     else:
-        output_filename_outer = f"wrfout_d01_{forecast_start_date.strftime('%Y-%m-%d_%H:%M:%S')}"
-
         shutil.copy(
             output_filename,
-            f"/home/wrf/external_data/forecast_output/{output_filename}",
+            f"{save_folder}/{output_filename}",
         )
 
-        shutil.copy(
-            output_filename_outer,
-            f"/home/wrf/external_data/forecast_output/{output_filename_outer}",
-        )

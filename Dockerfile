@@ -75,6 +75,16 @@ RUN pip install -r requirements.txt
 COPY build.sh $PREFIX
 USER wrf
 RUN ./build.sh
+
+
+# Install conda and create an environment with the correct variables
+# ENV CONDA_DIR /opt/conda
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && /bin/bash ~/miniconda.sh -b # -p /opt/conda
+# ENV PATH=/home/wrf/miniconda3/bin:$PATH
+
+COPY environment.yaml $PREFIX
+RUN /home/wrf/miniconda3/bin/conda env create -f environment.yaml
+
 COPY scripts $PREFIX
 COPY entrypoint.sh $PREFIX
 COPY src $PREFIX

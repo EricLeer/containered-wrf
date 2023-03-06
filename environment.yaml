@@ -1,0 +1,8 @@
+name: postenv
+channels: 
+  - conda-forge
+dependencies:
+  - xesmf
+  - dask 
+  - netCDF4
+  - xwrf
